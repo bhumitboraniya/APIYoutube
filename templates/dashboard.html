@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block title %}Stored Videos{% endblock %}
+
+{% block header %}Stored Videos{% endblock %}
+
+{% block content %}
+    <form method="get" action="{{ url_for('get_stored_videos') }}">
+        <label for="tag">Filter by Tag:</label>
+        <input type="text" id="tag" name="tag" value="{{ request.args.get('tag', '') }}">
+        <label for="order_by">Sort by:</label>
+        <select id="order_by" name="order_by">
+            <option value="published_at" {% if request.args.get('order_by') == 'published_at' %}selected{% endif %}>Published Date</option>
+            <option value="title" {% if request.args.get('order_by') == 'title' %}selected{% endif %}>Title</option>
+        </select>
+        <label for="order_direction">Order:</label>
+        <select id="order_direction" name="order_direction">
+            <option value="asc" {% if request.args.get('order_direction') == 'asc' %}selected{% endif %}>Ascending</option>
+            <option value="desc" {% if request.args.get('order_direction') == 'desc' %}selected{% endif %}>Descending</option>
+        </select>
+        <button type="submit">Apply Filters</button>
+    </form>
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Published At</th>
+                <th>Thumbnails</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for video in videos %}
+                <tr>
+                    <td>{{ video.title }}</td>
+                    <td>{{ video.description }}</td>
+                    <td>{{ video.published_at }}</td>
+                    <td><img src="{{ video.thumbnails }}" alt="Thumbnail"></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination-buttons">
+        <!-- Previous Page Button -->
+        {% if videos and total_pages > 1 and current_page > 1 %}
+            <a href="{{ url_for('get_stored_videos', page=current_page-1, tag=request.args.get('tag')) }}" class="pagination-button">Previous Page</a>
+        {% endif %}
+    
+        <!-- Next Page Button -->
+        {% if videos and total_pages > 1 and current_page < total_pages %}
+            <a href="{{ url_for('get_stored_videos', page=current_page+1, tag=request.args.get('tag')) }}" class="pagination-button">Next Page</a>
+        {% endif %}
+    </div>
+    
+    <div>
+        <p>Total Pages: {{ total_pages }}</p>
+        <p>Current Page: {{ current_page }}</p>
+    </div>
+{% endblock %}
